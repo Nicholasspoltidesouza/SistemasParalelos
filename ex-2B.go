@@ -17,8 +17,47 @@ func gerarVetorAleatorio(tamanho, min, max int) []int {
 	return vetor
 }
 
-func ordenacaoSequencial(vetor []int) {
-	sort.Ints(vetor)
+func ordenacaoSequencial(array []int, tamanhoBaldes int) []int {
+	var max, min int
+	for _, n := range array {
+		if n < min {
+			min = n
+		}
+		if n > max {
+			max = n
+		}
+	}
+	nBaldes := int(max-min)/tamanhoBaldes + 1
+	baldes := make([][]int, nBaldes)
+	for i := 0; i < nBaldes; i++ {
+		baldes[i] = make([]int, 0)
+	}
+
+	for _, n := range array {
+		idx := int(n-min) / tamanhoBaldes
+		baldes[idx] = append(baldes[idx], n)
+	}
+
+	ordenado := make([]int, 0)
+	for _, balde := range baldes {
+		if len(balde) > 0 {
+			insertionSort(balde)
+			ordenado = append(ordenado, balde...)
+		}
+	}
+
+	return ordenado
+}
+
+func insertionSort(array []int) {
+	for i := 0; i < len(array); i++ {
+		temp := array[i]
+		j := i - 1
+		for ; j >= 0 && array[j] > temp; j-- {
+			array[j+1] = array[j]
+		}
+		array[j+1] = temp
+	}
 }
 
 func ordenacaoParalela(vetor []int, nbaldes int, wg *sync.WaitGroup) {
@@ -79,7 +118,7 @@ func main() {
 
 	// Execução sequencial
 	tempoInicioSequencial := time.Now()
-	ordenacaoSequencial(vetorSequencial)
+	ordenacaoSequencial(vetorSequencial, tamanho)
 	tempoSequencial := time.Since(tempoInicioSequencial)
 	fmt.Printf("Tempo sequencial: %s\n", tempoSequencial)
 
