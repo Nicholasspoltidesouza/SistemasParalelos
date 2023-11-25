@@ -9,63 +9,52 @@ import (
 )
 
 func gerarVetorAleatorio(tamanho, min, max int) []int {
-	rand.Seed(time.Now().UnixNano())
-	vetor := make([]int, tamanho)
-	for i := 0; i < tamanho; i++ {
+	rand.Seed(time.Now().UnixNano()) // semente para geração de números aleatórios
+	vetor := make([]int, tamanho) // cria o vetor
+	for i := 0; i < tamanho; i++ { // preenche o vetor com números aleatórios
 		vetor[i] = rand.Intn(max-min+1) + min
 	}
 	return vetor
 }
 
 func ordenacaoSequencial(array []int, tamanhoBaldes int) []int {
-	var max, min int
-	for _, n := range array {
-		if n < min {
-			min = n
+	var max, min int // valor máximo e mínimo no vetor
+	for _, n := range array { // encontra o valor máximo e mínimo no vetor
+		if n < min { 
+			min = n	
 		}
 		if n > max {
 			max = n
 		}
 	}
-	nBaldes := int(max-min)/tamanhoBaldes + 1
-	baldes := make([][]int, nBaldes)
-	for i := 0; i < nBaldes; i++ {
-		baldes[i] = make([]int, 0)
+	nBaldes := int(max-min)/tamanhoBaldes + 1 // número de baldes
+	baldes := make([][]int, nBaldes) // cria os baldes
+	for i := 0; i < nBaldes; i++ { // inicializa os baldes
+		baldes[i] = make([]int, 0) 
 	}
 
-	for _, n := range array {
+	for _, n := range array { // distribui os valores nos baldes
 		idx := int(n-min) / tamanhoBaldes
-		baldes[idx] = append(baldes[idx], n)
+		baldes[idx] = append(baldes[idx], n) 
 	}
 
-	ordenado := make([]int, 0)
+	ordenado := make([]int, 0) // vetor ordenado
 	for _, balde := range baldes {
-		if len(balde) > 0 {
-			insertionSort(balde)
-			ordenado = append(ordenado, balde...)
+		if len(balde) > 0 { // ordena cada balde e concatena no vetor ordenado
+			sort.Ints(balde) // ordena o balde
+			ordenado = append(ordenado, balde...) // concatena o balde no vetor ordenado
 		}
 	}
 
-	return ordenado
-}
-
-func insertionSort(array []int) {
-	for i := 0; i < len(array); i++ {
-		temp := array[i]
-		j := i - 1
-		for ; j >= 0 && array[j] > temp; j-- {
-			array[j+1] = array[j]
-		}
-		array[j+1] = temp
-	}
+	return ordenado // retorna o vetor ordenado
 }
 
 func ordenacaoParalela(vetor []int, nbaldes int, wg *sync.WaitGroup) {
-	defer wg.Done()
+	defer wg.Done() // decrementa o contador de goroutines
 
-	baldes := make([][]int, nbaldes)
-	minValor := vetor[0]
-	maxValor := vetor[0]
+	baldes := make([][]int, nbaldes) // cria os baldes
+	minValor := vetor[0] // valor mínimo no vetor
+	maxValor := vetor[0] // valor máximo no vetor
 
 	// Encontrar os valores mínimo e máximo no vetor
 	for _, valor := range vetor {
@@ -78,15 +67,15 @@ func ordenacaoParalela(vetor []int, nbaldes int, wg *sync.WaitGroup) {
 	}
 
 	// Determinar o intervalo de cada balde
-	intervaloBalde := (maxValor - minValor + 1) / nbaldes
+	intervaloBalde := (maxValor - minValor + 1) / nbaldes 
 
 	// Distribuir valores nos baldes
 	for _, valor := range vetor {
 		indiceBalde := (valor - minValor) / intervaloBalde
-		if indiceBalde == nbaldes {
+		if indiceBalde == nbaldes { // se o valor for igual ao máximo, coloca no último balde
 			indiceBalde--
 		}
-		baldes[indiceBalde] = append(baldes[indiceBalde], valor)
+		baldes[indiceBalde] = append(baldes[indiceBalde], valor) // adiciona o valor no balde
 	}
 
 	// Ordenar cada balde
