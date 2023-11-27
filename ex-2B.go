@@ -136,9 +136,5 @@ func main() {
 
 		tempoParalelo := time.Since(tempoInicioParalelo)
 		fmt.Printf("Tempo paralelo: %s\n", tempoParalelo)
-
-		// Calcula o speedup em relação à versão sequencial
-		speedup := float64(tempoSequencial) / float64(tempoParalelo)
-		fmt.Printf("Speedup: %.2f\n", speedup)
 	}
 }
